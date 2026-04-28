@@ -45,6 +45,10 @@ La respuesta esperada por ahora es:
 
 FastAPI genera automaticamente estas rutas:
 
+```bash
+fastapi dev
+```
+
 - Swagger UI: `http://127.0.0.1:8000/docs`
 - ReDoc: `http://127.0.0.1:8000/redoc`
 
