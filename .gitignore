@@ -1,2 +1,39 @@
+# Python bytecode/cache
 __pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
 .venv/
+venv/
+env/
+ENV/
+
+# Environment variables and local secrets
+.env
+.env.*
+!.env.example
+
+# FastAPI/Uvicorn runtime files
+*.log
+*.pid
+
+# Test and coverage output
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Type checker/cache folders
+.mypy_cache/
+.ruff_cache/
+.pyre/
+
+# Build/package artifacts
+build/
+dist/
+*.egg-info/
+
+# IDE/editor files
+.vscode/
+.idea/
+.DS_Store
