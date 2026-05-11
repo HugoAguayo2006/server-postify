@@ -1,7 +1,7 @@
 import os
 from typing import AsyncGenerator
 from dotenv import load_dotenv
-from sqlalchemy.ext.asyncio import async_sesssionmaker,create_async_engine # esto hace las querrys
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine # esto hace las querrys
 
 
 
@@ -12,6 +12,8 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 # posgres con asincronia en cada sesion que se vaya abrinedo
 engine =  create_async_engine(DATABASE_URL, echo=True)
 
-AsynSeccionLocal = async_sesssionmaker(engine,expire_on_commit=False)
+AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 
-async def get_session() -> AsyncGenerator
+async def get_session() -> AsyncGenerator[AsyncSession,None]:
+    async with AsyncSessionLocal() as session:
+        yield session
