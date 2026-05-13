@@ -12,6 +12,15 @@ class UserCreate(SQLModel):
     email: str
     password: str
 
+
+class UserUpdate(SQLModel):
+    username: str
+    name: str
+    lastname: str
+    email: str
+    password: str
+
+
 class UserRead(SQLModel):
     id: uuid.UUID
     username: str
