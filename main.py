@@ -17,7 +17,9 @@ app = FastAPI(lifespan=lifespan)
 # para poder tener una comunicacion local a local
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['http://localhost:5173']
+    allow_origins=["http://localhost:5173"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(users.router)

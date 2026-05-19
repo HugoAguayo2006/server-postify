@@ -14,11 +14,11 @@ class UserCreate(SQLModel):
 
 
 class UserUpdate(SQLModel):
-    username: str
-    name: str
-    lastname: str
-    email: str
-    password: str
+    username: str | None = None
+    name: str | None = None
+    lastname: str | None = None
+    email: str | None = None
+    password: str | None = None
 
 
 class UserRead(SQLModel):

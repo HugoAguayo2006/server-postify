@@ -6,6 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
 from app.db.session import get_session
+from app.models.comment import Comment
+from app.models.images import Image
+from app.models.like import Like
 from app.models.post import Post
 from app.models.user import User
 from app.schemas.user import UserCreate, UserRead, UserUpdate
@@ -63,6 +66,16 @@ async def delete_user(user_id: uuid.UUID, session: AsyncSession = Depends(get_se
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
+    user_posts = await session.execute(select(Post.id).where(Post.user_id == user_id))
+    post_ids = user_posts.scalars().all()
+
+    if post_ids:
+        await session.execute(delete(Like).where(Like.post_id.in_(post_ids)))
+        await session.execute(delete(Comment).where(Comment.post_id.in_(post_ids)))
+        await session.execute(delete(Image).where(Image.post_id.in_(post_ids)))
+
+    await session.execute(delete(Like).where(Like.user_id == user_id))
+    await session.execute(delete(Comment).where(Comment.user_id == user_id))
     await session.execute(delete(Post).where(Post.user_id == user_id))
     await session.delete(user)
     await session.commit()

@@ -1,4 +1,7 @@
 from app.models.user import User
 from app.models.post import Post
+from app.models.images import Image
+from app.models.like import Like
+from app.models.comment import Comment
 
-__all__ = ["User", "Post"]
+__all__ = ["User", "Post","Image","Like", "Comment"]
