@@ -2,6 +2,7 @@ import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy import delete
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
@@ -18,13 +19,13 @@ from app.schemas.user import UserCreate, UserRead, UserUpdate
 router = APIRouter(prefix="/users", tags=["users"])
 
 
-@router.get("/", response_model=list[UserRead])
+@router.get("/", response_model=list[UserRead], summary="Get Users")
 async def get_users(session: AsyncSession = Depends(get_session)):
     result = await session.execute(select(User))
     return result.scalars().all()
 
 
-@router.get("/{user_id}", response_model=UserRead)
+@router.get("/{user_id}", response_model=UserRead, summary="Get User")
 async def get_user(user_id: uuid.UUID, session: AsyncSession = Depends(get_session)):
     user = await session.get(User, user_id)
     if not user:
@@ -32,18 +33,22 @@ async def get_user(user_id: uuid.UUID, session: AsyncSession = Depends(get_sessi
     return user
 
 
-@router.get("/{user_id}/posts", response_model=list[PostRead])
+@router.get("/{user_id}/posts", response_model=list[PostRead], summary="Get User Posts")
 async def get_user_posts(user_id: uuid.UUID, session: AsyncSession = Depends(get_session)):
     user = await session.get(User, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    result = await session.execute(select(Post).where(Post.user_id == user_id))
+    result = await session.execute(
+        select(Post)
+        .where(Post.user_id == user_id)
+        .options(selectinload(Post.images))
+    )
     return result.scalars().all()
 
 
-@router.post("/", response_model=UserRead, status_code=201)
-async def create_ser(data: UserCreate, session: AsyncSession = Depends(get_session)):
+@router.post("/", response_model=UserRead, status_code=201, summary="Create User")
+async def create_user(data: UserCreate, session: AsyncSession = Depends(get_session)):
     user = User(**data.model_dump())
     session.add(user)
     await session.commit()
@@ -51,7 +56,7 @@ async def create_ser(data: UserCreate, session: AsyncSession = Depends(get_sessi
     return user
 
 
-@router.patch("/{user_id}", response_model=UserRead)
+@router.patch("/{user_id}", response_model=UserRead, summary="Update User")
 async def update_user(
     user_id: uuid.UUID,
     data: UserUpdate,
@@ -71,7 +76,7 @@ async def update_user(
     return user
 
 
-@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Delete User")
 async def delete_user(user_id: uuid.UUID, session: AsyncSession = Depends(get_session)):
     user = await session.get(User, user_id)
     if not user:
