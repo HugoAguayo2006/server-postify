@@ -1,3 +1,4 @@
+from typing import List
 import uuid
 
 from sqlalchemy import delete
@@ -138,3 +139,9 @@ async def add_comment(
     await session.refresh(comment)
 
     return CommentRead(**comment.model_dump())
+
+
+@router.get('/{userId}/posts', response_model=List[PostRead], status_code=200)
+async def get_posts_by_user(userId: uuid.UUID, session: AsyncSession = Depends(get_session)):
+    res = await session.execute(select(Post).where(Post.user_id == userId))
+    return res.scalars().all()

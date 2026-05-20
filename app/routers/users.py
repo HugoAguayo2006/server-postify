@@ -11,6 +11,7 @@ from app.models.images import Image
 from app.models.like import Like
 from app.models.post import Post
 from app.models.user import User
+from app.schemas.post import PostRead
 from app.schemas.user import UserCreate, UserRead, UserUpdate
 
 
@@ -29,6 +30,16 @@ async def get_user(user_id: uuid.UUID, session: AsyncSession = Depends(get_sessi
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
+
+@router.get("/{user_id}/posts", response_model=list[PostRead])
+async def get_user_posts(user_id: uuid.UUID, session: AsyncSession = Depends(get_session)):
+    user = await session.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    result = await session.execute(select(Post).where(Post.user_id == user_id))
+    return result.scalars().all()
 
 
 @router.post("/", response_model=UserRead, status_code=201)
